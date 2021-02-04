@@ -8,6 +8,7 @@ import lenz.opengl.Texture;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -184,60 +185,18 @@ public class Project extends AbstractOpenGLBase {
 		shaderProgramDonut = new ShaderProgram("donut");
 		glUseProgram(shaderProgramDonut.getId());
 
-		ArrayList<Float> vertices = new ArrayList<>();
-		ArrayList<Float> textures = new ArrayList<>();
-		ArrayList<Float> normals = new ArrayList<>();
-		ArrayList<String> faces = new ArrayList<>();
-
-		File myObj = new File("src\\res\\donut.obj");
-		Scanner myReader = null;
+		OBJ_Loader donutObj = null;
 		try {
-			myReader = new Scanner(myObj);
-		} catch (FileNotFoundException e) {
+			donutObj = new OBJ_Loader("src\\res\\donut.obj");
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		while (true) {
-			assert myReader != null;
-			if (!myReader.hasNextLine()) break;
-			String data = myReader.nextLine();
-			String[] currentLine = data.split(" ");
-			if (data.startsWith("v ")) {
-				for (int i = 1; i <= 3; i++)
-					vertices.add(Float.parseFloat(currentLine[i]));
-			}
-			else if (data.startsWith("vt ")) {
-				for (int i = 1; i <= 2; i++)
-					textures.add(Float.parseFloat(currentLine[i]));
-			}
-			else if (data.startsWith("vn ")) {
-				for (int i = 1; i <= 3; i++)
-					normals.add(Float.parseFloat(currentLine[i]));
-			}
-			else if (data.startsWith("f ")) {
-				for (int i = 1; i <= 3; i++)
-					faces.add(currentLine[i]);
-			}
-		}
 
-		float[] coordinatesDonut = new float[faces.size()*3];
+		assert donutObj != null;
+		float[] coordinatesDonut = donutObj.getVertex();
 		float[] colorsDonut = new float[coordinatesDonut.length];
-		float[] normalsDonut = new float[faces.size()*3];
-		float[] texDonut = new float[faces.size()*2];
-
-		for (int i=0; i<faces.size(); i++) {
-			String[] numberStrs = faces.get(i).split("/");
-			int[] currentLine = new int[numberStrs.length];
-			for(int j=0; j<numberStrs.length; j++)
-				currentLine[j] = Integer.parseInt(numberStrs[j]);
-
-			for (int j=0; j<3; j++) {
-				coordinatesDonut[3*i+j]= vertices.get(3*(currentLine[0]-1)+j);
-				normalsDonut[3*i+j]= normals.get(3*(currentLine[2]-1)+j);
-			}
-			for (int j=0; j<2; j++) {
-				texDonut[2*i+j]= textures.get(2*(currentLine[1]-1)+j);
-			}
-		}
+		float[] normalsDonut = donutObj.getNormal();
+		float[] texDonut = donutObj.getTexture();
 
 		textPathDonut = new Texture("moonTex.png");
 		numCornersDonut = (coordinatesDonut.length) / 3;
