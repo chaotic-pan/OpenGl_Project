@@ -122,6 +122,7 @@ public class Project extends AbstractOpenGLBase {
 		glVertexAttribPointer(2,3,GL_FLOAT,false,0,0);
 		glEnableVertexAttribArray(2);
 
+
 		vbo = glGenBuffers();
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, texCube, GL_STATIC_DRAW);
@@ -153,28 +154,8 @@ public class Project extends AbstractOpenGLBase {
 				0.7f, 0.7f, 0.2f, 		0.7f, 0.7f, 0.2f, 		0.7f, 0.7f, 0.2f,
 				0.7f, 0.2f, 0.7f, 		0.7f, 0.2f, 0.7f, 		0.7f, 0.2f, 0.7f,
 		};
-		float[] normalsPyramid = new float[coordinatesPyramid.length];
-		for (int i=0; i<coordinatesPyramid.length; i+=9) {
-			float[] a = new float[]{coordinatesPyramid[i], coordinatesPyramid[i+1], coordinatesPyramid[i+2]};
-			float[] b = new float[]{coordinatesPyramid[i+3], coordinatesPyramid[i+4], coordinatesPyramid[i+5]};
-			float[] c = new float[]{coordinatesPyramid[i+6], coordinatesPyramid[i+7], coordinatesPyramid[i+8]};
+		float[] normalsPyramid = Normals.calcNormals(coordinatesPyramid);
 
-			float[] r = new float[]{b[0]-a[0], b[1]-a[1], b[2]-a[2]};
-			float[] s = new float[]{c[0]-a[0], c[1]-a[1], c[2]-a[2]};
-			float[] n= new float[] {
-					r[1] * s[2] - r[2] * s[1],
-					r[2] * s[0] - r[0] * s[2],
-					r[0] * s[1] - r[1] * s[0],
-			};
-			float[] m = new float[]{
-					n[0],n[1],n[2],
-					n[0],n[1],n[2],
-					n[0],n[1],n[2]
-			};
-			for (int j = 0; j < 9; j++) {
-				normalsPyramid[i + j] = m[j];
-			}
-		}
 		numCornersPyramid = (coordinatesPyramid.length) / 3;
 		vaoPyramid = glGenVertexArrays();
 		glBindVertexArray(vaoPyramid);
