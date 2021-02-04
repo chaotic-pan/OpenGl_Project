@@ -15,22 +15,19 @@ import java.util.Scanner;
 public class Project extends AbstractOpenGLBase {
 
 	private ShaderProgram shaderProgramCube;
-	private ShaderProgram shaderProgramPyramid;
 	private ShaderProgram shaderProgramDonut;
 
 	public static void main(String[] args) {
 		new Project().start("CG Projekt", 700, 700);
 	}
 
+	Model pyramid;
 	int vaoCube;
-	int vaoPyramid;
 	int vaoDonut;
 	int numCornersCube;
-	int numCornersPyramid;
 	int numCornersDonut;
 	float angle;
 	Matrix4 transMatrixCube;
-	Matrix4 transMatrixPyramid;
 	Matrix4 transMatrixDonut;
 	Texture textPathCube;
 	Texture textPathDonut;
@@ -130,13 +127,12 @@ public class Project extends AbstractOpenGLBase {
 		glVertexAttribPointer(3,2,GL_FLOAT,false,0,0);
 		glEnableVertexAttribArray(3);
 		glBindTexture(GL_TEXTURE_2D, textPathCube.getId());
-
 		int lo = glGetUniformLocation(shaderProgramCube.getId(), "projectionsMatrix");
 		glUniformMatrix4fv(lo, false, proMatrix.getValuesAsArray());
 
 
-		shaderProgramPyramid = new ShaderProgram("pyramid");
-		glUseProgram(shaderProgramPyramid.getId());
+
+
 		float[] coordinatesPyramid = new float[]{
 				1f, -1.2f, -1f, 		1f, -1.2f, 1f, 			-1f, -1.2f, 1f,
 				1f, -1.2f, -1f, 		-1f, -1.2f, 1f, 		-1f, -1.2f, -1f,
@@ -155,32 +151,7 @@ public class Project extends AbstractOpenGLBase {
 				0.7f, 0.7f, 0.2f, 		0.7f, 0.7f, 0.2f, 		0.7f, 0.7f, 0.2f,
 				0.7f, 0.2f, 0.7f, 		0.7f, 0.2f, 0.7f, 		0.7f, 0.2f, 0.7f,
 		};
-		float[] normalsPyramid = Normals.calcNormals(coordinatesPyramid);
-
-		numCornersPyramid = (coordinatesPyramid.length) / 3;
-		vaoPyramid = glGenVertexArrays();
-		glBindVertexArray(vaoPyramid);
-
-		vbo = glGenBuffers();
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, coordinatesPyramid, GL_STATIC_DRAW);
-		glVertexAttribPointer(0,3,GL_FLOAT,false,0,0);
-		glEnableVertexAttribArray(0);
-
-		vbo = glGenBuffers();
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, colorsPyramid, GL_STATIC_DRAW);
-		glVertexAttribPointer(1,3,GL_FLOAT,false,0,0);
-		glEnableVertexAttribArray(1);
-
-		vbo = glGenBuffers();
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, normalsPyramid, GL_STATIC_DRAW);
-		glVertexAttribPointer(2,3,GL_FLOAT,false,0,0);
-		glEnableVertexAttribArray(2);
-		lo = glGetUniformLocation(shaderProgramPyramid.getId(), "projectionsMatrix");
-		glUniformMatrix4fv(lo, false, proMatrix.getValuesAsArray());
-
+		pyramid = new Model("pyramid", coordinatesPyramid, colorsPyramid, proMatrix);
 
 		shaderProgramDonut = new ShaderProgram("donut");
 		glUseProgram(shaderProgramDonut.getId());
@@ -244,9 +215,10 @@ public class Project extends AbstractOpenGLBase {
 		Matrix4 orbit = new Matrix4();
 		orbit.translate(0,0,-2.5f).rotateZ(2*angle);
 
-		transMatrixPyramid = new Matrix4();
+		Matrix4 transMatrixPyramid = new Matrix4();
 		transMatrixPyramid.multiply(orbit);
 		transMatrixPyramid.scale(0.3f).translate(-7,5,0).rotateZ(5*angle).rotateX(2*angle);
+		pyramid.setTransMatrix(transMatrixPyramid);
 
 		transMatrixDonut = new Matrix4();
 		transMatrixDonut.multiply(orbit);
@@ -268,14 +240,14 @@ public class Project extends AbstractOpenGLBase {
 		glDrawArrays(GL_COLOR, 0, numCornersCube);
 
 
-		glUseProgram(shaderProgramPyramid.getId());
-		matrixVal = transMatrixPyramid.getValuesAsArray();
-		loc = glGetUniformLocation(shaderProgramPyramid.getId(), "posJ");
+		glUseProgram(pyramid.getShader().getId());
+		matrixVal = pyramid.getTransMatrix().getValuesAsArray();
+		loc = glGetUniformLocation(pyramid.getShader().getId(), "posJ");
 		glUniformMatrix4fv(loc, false, matrixVal);
 
-		glBindVertexArray(vaoPyramid);
-		glDrawArrays(GL_TRIANGLES, 0, numCornersPyramid);
-		glDrawArrays(GL_COLOR, 0, numCornersPyramid);
+		glBindVertexArray(pyramid.getVao());
+		glDrawArrays(GL_TRIANGLES, 0, pyramid.getNumCorners());
+		glDrawArrays(GL_COLOR, 0, pyramid.getNumCorners());
 
 
 		glUseProgram(shaderProgramDonut.getId());

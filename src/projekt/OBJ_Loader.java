@@ -43,18 +43,6 @@ public class OBJ_Loader {
         normalArray = sort(faces, normalList,3, 2);
     }
 
-    public float[] getVertex(){
-        return vertexArray;
-    }
-
-    public float[] getTexture(){
-        return textureArray;
-    }
-
-    public float[] getNormal(){
-        return normalArray;
-    }
-
     private float[] sort(ArrayList<String> faces, ArrayList<Float> dataList, int dimensions, int place) {
         float[] arr = new float[faces.size()*dimensions];
         for (int i=0; i<faces.size(); i++) {
@@ -70,4 +58,15 @@ public class OBJ_Loader {
         return arr;
     }
 
+    public float[] getVertex(){
+        return vertexArray;
+    }
+
+    public float[] getTexture(){
+        return textureArray;
+    }
+
+    public float[] getNormal(){
+        return normalArray;
+    }
 }
