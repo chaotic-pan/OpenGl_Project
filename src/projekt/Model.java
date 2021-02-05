@@ -11,19 +11,21 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class Model {
-    private ShaderProgram shader;
+    private final ShaderProgram shader;
     private int vao;
-    private int numCorners;
+    private final int numCorners;
     private Matrix4 transMatrix;
 
-    public Model(String name, float[] coordinates, float[] colors, Matrix4 proMatrix){
+    public Model(String name, float[] coordinates, float[] colors, float[] normals, Matrix4 proMatrix){
         shader = new ShaderProgram(name);
         glUseProgram(shader.getId());
 
-        float[] normal = Normals.calcNormals(coordinates);
+        if (colors==null) colors = new float[coordinates.length];
+        if (normals==null) normals = Normals.calcNormals(coordinates);
+
         numCorners = (coordinates.length) / 3;
 
-        initVao(coordinates, colors, normal);
+        initVao(coordinates, colors, normals);
 
         int lo = glGetUniformLocation(shader.getId(), "projectionsMatrix");
         glUniformMatrix4fv(lo, false, proMatrix.getValuesAsArray());

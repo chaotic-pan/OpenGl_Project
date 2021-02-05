@@ -14,30 +14,20 @@ import java.util.Scanner;
 
 public class Project extends AbstractOpenGLBase {
 
-	private ShaderProgram shaderProgramCube;
-	private ShaderProgram shaderProgramDonut;
+	Model pyramid;
+	TexturedModel cube;
+	TexturedModel donut;
+	float angle;
 
 	public static void main(String[] args) {
 		new Project().start("CG Projekt", 700, 700);
 	}
 
-	Model pyramid;
-	int vaoCube;
-	int vaoDonut;
-	int numCornersCube;
-	int numCornersDonut;
-	float angle;
-	Matrix4 transMatrixCube;
-	Matrix4 transMatrixDonut;
-	Texture textPathCube;
-	Texture textPathDonut;
-
 	@Override
 	protected void init() {
 		Matrix4 proMatrix = new Matrix4(1.0f, 10f);
 
-		shaderProgramCube = new ShaderProgram("cube");
-		glUseProgram(shaderProgramCube.getId());
+
 		float[] coordinatesCube = new float[]{
 				1, 1, 1, 		-1, 1, 1, 		-1, -1, 1,
 				1, 1, 1, 		-1, -1, 1, 		1, -1, 1,
@@ -56,26 +46,6 @@ public class Project extends AbstractOpenGLBase {
 
 				1, -1, -1, 		1, -1, 1, 		-1, -1, 1,
 				1, -1, -1, 		-1, -1, 1, 		-1, -1, -1,
-		};
-		float[] colorsCube = new float[coordinatesCube.length];
-		float[] normalsCube = new float[] {
-				0, 0, 1,		0, 0, 1,		0, 0, 1,
-				0, 0, 1,		0, 0, 1,		0, 0, 1,
-
-				-1, 0, 0,		-1, 0, 0,		-1, 0, 0,
-				-1, 0, 0,		-1, 0, 0,		-1, 0, 0,
-
-				0, 0, -1,		0, 0, -1,		0, 0, -1,
-				0, 0, -1,		0, 0, -1,		0, 0, -1,
-
-				1, 0, 0,		1, 0, 0,		1, 0, 0,
-				1, 0, 0,		1, 0, 0,		1, 0, 0,
-
-				0, 1, 0,		0, 1, 0,		0, 1, 0,
-				0, 1, 0,		0, 1, 0,		0, 1, 0,
-
-				0, -1, 0,		0, -1, 0,		0, -1, 0,
-				0, -1, 0,		0, -1, 0,		0, -1, 0,
 		};
 		float[] texCube = new float[] {
 				0.5f, 0, 		 	0.25f, 0,  			0.25f, 0.33f,
@@ -96,40 +66,9 @@ public class Project extends AbstractOpenGLBase {
 				0.5f, 0.663f,	 	0.5f, 0.334f,		0.25f, 0.334f,
 				0.5f, 0.663f,		0.25f, 0.334f,	 	0.25f, 0.662f,
 		};
-		textPathCube = new Texture("worldTex.jpg");
-		numCornersCube = (coordinatesCube.length) / 3;
 
-		vaoCube = glGenVertexArrays();
-		glBindVertexArray(vaoCube);
-
-		int vbo = glGenBuffers();
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, coordinatesCube, GL_STATIC_DRAW);
-		glVertexAttribPointer(0,3,GL_FLOAT,false,0,0);
-		glEnableVertexAttribArray(0);
-
-		vbo = glGenBuffers();
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, colorsCube, GL_STATIC_DRAW);
-		glVertexAttribPointer(1,3,GL_FLOAT,false,0,0);
-		glEnableVertexAttribArray(1);
-
-		vbo = glGenBuffers();
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, normalsCube, GL_STATIC_DRAW);
-		glVertexAttribPointer(2,3,GL_FLOAT,false,0,0);
-		glEnableVertexAttribArray(2);
-
-
-		vbo = glGenBuffers();
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, texCube, GL_STATIC_DRAW);
-		glVertexAttribPointer(3,2,GL_FLOAT,false,0,0);
-		glEnableVertexAttribArray(3);
-		glBindTexture(GL_TEXTURE_2D, textPathCube.getId());
-		int lo = glGetUniformLocation(shaderProgramCube.getId(), "projectionsMatrix");
-		glUniformMatrix4fv(lo, false, proMatrix.getValuesAsArray());
-
+		cube = new TexturedModel("cube", coordinatesCube, null, null, texCube,
+									new Texture("worldTex.jpg"), proMatrix);
 
 
 
@@ -151,10 +90,9 @@ public class Project extends AbstractOpenGLBase {
 				0.7f, 0.7f, 0.2f, 		0.7f, 0.7f, 0.2f, 		0.7f, 0.7f, 0.2f,
 				0.7f, 0.2f, 0.7f, 		0.7f, 0.2f, 0.7f, 		0.7f, 0.2f, 0.7f,
 		};
-		pyramid = new Model("pyramid", coordinatesPyramid, colorsPyramid, proMatrix);
 
-		shaderProgramDonut = new ShaderProgram("donut");
-		glUseProgram(shaderProgramDonut.getId());
+		pyramid = new Model("pyramid", coordinatesPyramid, colorsPyramid, null, proMatrix);
+
 
 		OBJ_Loader donutObj = null;
 		try {
@@ -164,42 +102,8 @@ public class Project extends AbstractOpenGLBase {
 		}
 
 		assert donutObj != null;
-		float[] coordinatesDonut = donutObj.getVertex();
-		float[] colorsDonut = new float[coordinatesDonut.length];
-		float[] normalsDonut = donutObj.getNormal();
-		float[] texDonut = donutObj.getTexture();
-
-		textPathDonut = new Texture("moonTex.png");
-		numCornersDonut = (coordinatesDonut.length) / 3;
-		vaoDonut = glGenVertexArrays();
-		glBindVertexArray(vaoDonut);
-
-		vbo = glGenBuffers();
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, coordinatesDonut, GL_STATIC_DRAW);
-		glVertexAttribPointer(0,3,GL_FLOAT,false,0,0);
-		glEnableVertexAttribArray(0);
-
-		vbo = glGenBuffers();
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, colorsDonut, GL_STATIC_DRAW);
-		glVertexAttribPointer(1,3,GL_FLOAT,false,0,0);
-		glEnableVertexAttribArray(1);
-
-		vbo = glGenBuffers();
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, normalsDonut, GL_STATIC_DRAW);
-		glVertexAttribPointer(2,3,GL_FLOAT,false,0,0);
-		glEnableVertexAttribArray(2);
-
-		vbo = glGenBuffers();
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, texDonut, GL_STATIC_DRAW);
-		glVertexAttribPointer(3,2,GL_FLOAT,false,0,0);
-		glEnableVertexAttribArray(3);
-		glBindTexture(GL_TEXTURE_2D, textPathDonut.getId());
-		lo = glGetUniformLocation(shaderProgramDonut.getId(), "projectionsMatrix");
-		glUniformMatrix4fv(lo, false, proMatrix.getValuesAsArray());
+		donut = new TexturedModel("donut", donutObj.getVertex(), null, donutObj.getNormal(),
+									donutObj.getTexture(), new Texture("moonTex.png"), proMatrix);
 
 		glEnable(GL_DEPTH_TEST); // z-Buffer aktivieren
 		glEnable(GL_CULL_FACE); // backface culling aktivieren
@@ -209,8 +113,9 @@ public class Project extends AbstractOpenGLBase {
 	public void update() {
 		angle+= 0.01f;
 
-		transMatrixCube = new Matrix4();
+		Matrix4 transMatrixCube = new Matrix4();
 		transMatrixCube.scale(0.5f).translate(0,0,-2.5f).rotateX(angle/2).rotateY(angle/2).rotateZ(angle/2);
+		cube.setTransMatrix(transMatrixCube);
 
 		Matrix4 orbit = new Matrix4();
 		orbit.translate(0,0,-2.5f).rotateZ(2*angle);
@@ -220,24 +125,26 @@ public class Project extends AbstractOpenGLBase {
 		transMatrixPyramid.scale(0.3f).translate(-7,5,0).rotateZ(5*angle).rotateX(2*angle);
 		pyramid.setTransMatrix(transMatrixPyramid);
 
-		transMatrixDonut = new Matrix4();
+		Matrix4 transMatrixDonut = new Matrix4();
 		transMatrixDonut.multiply(orbit);
 		transMatrixDonut.scale(0.3f).translate(9,0,0).rotateZ(3*angle).rotateX(angle);
+		donut.setTransMatrix(transMatrixDonut);
 	}
 
 	@Override
 	protected void render() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glUseProgram(shaderProgramCube.getId());
-		float[] matrixVal = transMatrixCube.getValuesAsArray();
-		int loc = glGetUniformLocation(shaderProgramCube.getId(), "posJ");
+		glUseProgram(cube.getShader().getId());
+		float[] matrixVal = cube.getTransMatrix().getValuesAsArray();
+		int loc = glGetUniformLocation(cube.getShader().getId(), "posJ");
 		glUniformMatrix4fv(loc, false, matrixVal);
 
-		glBindVertexArray(vaoCube);
-		glBindTexture(GL_TEXTURE_2D, textPathCube.getId());
-		glDrawArrays(GL_TRIANGLES, 0, numCornersCube);
-		glDrawArrays(GL_COLOR, 0, numCornersCube);
+		glBindVertexArray(cube.getVao());
+		glBindTexture(GL_TEXTURE_2D, cube.getTexturePath().getId());
+		glDrawArrays(GL_TRIANGLES, 0, cube.getNumCorners());
+		glDrawArrays(GL_COLOR, 0, cube.getNumCorners());
+
 
 
 		glUseProgram(pyramid.getShader().getId());
@@ -250,15 +157,15 @@ public class Project extends AbstractOpenGLBase {
 		glDrawArrays(GL_COLOR, 0, pyramid.getNumCorners());
 
 
-		glUseProgram(shaderProgramDonut.getId());
-		matrixVal = transMatrixDonut.getValuesAsArray();
-		loc = glGetUniformLocation(shaderProgramDonut.getId(), "posJ");
+		glUseProgram(donut.getShader().getId());
+		matrixVal = donut.getTransMatrix().getValuesAsArray();
+		loc = glGetUniformLocation(donut.getShader().getId(), "posJ");
 		glUniformMatrix4fv(loc, false, matrixVal);
 
-		glBindVertexArray(vaoDonut);
-		glBindTexture(GL_TEXTURE_2D, textPathDonut.getId());
-		glDrawArrays(GL_TRIANGLES, 0, numCornersDonut);
-		glDrawArrays(GL_COLOR, 0, numCornersDonut);
+		glBindVertexArray(donut.getVao());
+		glBindTexture(GL_TEXTURE_2D, donut.getTexturePath().getId());
+		glDrawArrays(GL_TRIANGLES, 0, donut.getNumCorners());
+		glDrawArrays(GL_COLOR, 0, donut.getNumCorners());
 	}
 
 	@Override
