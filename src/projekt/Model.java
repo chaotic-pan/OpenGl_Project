@@ -11,6 +11,8 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class Model {
+    private float rotate;
+    private float scale;
     private final ShaderProgram shader;
     private int vao;
     private final int numCorners;
@@ -34,16 +36,16 @@ public class Model {
     private void initVao(float[] coordinates, float[] colors, float[] normals) {
         vao = glGenVertexArrays();
         glBindVertexArray(vao);
-        initVbo(coordinates, 0);
-        initVbo(colors, 1);
-        initVbo(normals, 2);
+        initVbo(coordinates, 0, 3);
+        initVbo(colors, 1, 3);
+        initVbo(normals, 2, 3);
     }
 
-    private void initVbo(float[] data, int index) {
+    public void initVbo(float[] data, int index, int size) {
         int vbo = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
-        glVertexAttribPointer(index, 3,GL_FLOAT,false,0,0);
+        glVertexAttribPointer(index, size,GL_FLOAT,false,0,0);
         glEnableVertexAttribArray(index);
     }
 
@@ -55,15 +57,22 @@ public class Model {
         return vao;
     }
 
-    public int getNumCorners(){
-        return numCorners;
-    }
-
     public void setTransMatrix(Matrix4 transMatrix){
         this.transMatrix=transMatrix;
     }
 
     public Matrix4 getTransMatrix(){
         return transMatrix;
+    }
+
+    public void render() {
+        glUseProgram(shader.getId());
+        float[] matrixVal = transMatrix.getValuesAsArray();
+        int loc = glGetUniformLocation(shader.getId(), "posJ");
+        glUniformMatrix4fv(loc, false, matrixVal);
+
+        glBindVertexArray(vao);
+        glDrawArrays(GL_TRIANGLES, 0, numCorners);
+        glDrawArrays(GL_COLOR, 0, numCorners);
     }
 }

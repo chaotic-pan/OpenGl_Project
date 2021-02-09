@@ -23,24 +23,13 @@ public class TexturedModel extends Model {
     }
 
     protected void initVao(float[] texture) {
-        glBindVertexArray(super.getVao());
-        initVbo(texture);
-    }
-
-    private void initVbo(float[] data) {
-        int vbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
-        glVertexAttribPointer(3, 2,GL_FLOAT,false,0,0);
-        glEnableVertexAttribArray(3);
+        super.initVbo(texture, 3, 2);
         glBindTexture(GL_TEXTURE_2D, texturePath.getId());
     }
 
-    public void setTexture(Texture texturePath){
-        this.texturePath=texturePath;
-    }
+    public void render() {
+        glBindTexture(GL_TEXTURE_2D, texturePath.getId());
+        super.render();
 
-    public Texture getTexturePath(){
-        return texturePath;
     }
 }
