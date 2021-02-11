@@ -11,8 +11,6 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public class Model {
-    private float rotate;
-    private float scale;
     private final ShaderProgram shader;
     private int vao;
     private final int numCorners;

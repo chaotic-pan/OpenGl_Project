@@ -10,14 +10,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class Project extends AbstractOpenGLBase {
 
 	ModelFactory factory = new ModelFactory();
-	Model pyramid;
-	TexturedModel cube;
-	TexturedModel donut;
+	HashMap<String, Model> modelMap = new HashMap<>();
 	float angle;
 
 	public static void main(String[] args) {
@@ -26,9 +25,9 @@ public class Project extends AbstractOpenGLBase {
 
 	@Override
 	protected void init() {
-		pyramid = factory.getModel("pyramid");
-		cube = (TexturedModel) factory.getModel("cube");
-		donut = (TexturedModel) factory.getModel("donut");
+		modelMap.put("pyramid",factory.getModel("pyramid"));
+		modelMap.put("cube", factory.getModel("cube"));
+		modelMap.put("donut", factory.getModel("donut"));
 
 		glEnable(GL_DEPTH_TEST); // z-Buffer aktivieren
 		glEnable(GL_CULL_FACE); // backface culling aktivieren
@@ -40,11 +39,11 @@ public class Project extends AbstractOpenGLBase {
 
 		Matrix4 orbit = new Matrix4().translate(0,0,-2.5f).rotateZ(2*angle);
 
-		cube.setTransMatrix(new Matrix4().scale(0.5f).translate(0,0,-2.5f)
+		modelMap.get("cube").setTransMatrix(new Matrix4().scale(0.5f).translate(0,0,-2.5f)
 								.rotateX(angle/2).rotateY(angle/2).rotateZ(angle/2));
-		pyramid.setTransMatrix(new Matrix4().multiply(orbit).scale(0.3f).translate(-7,5,0)
+		modelMap.get("pyramid").setTransMatrix(new Matrix4().multiply(orbit).scale(0.3f).translate(-7,5,0)
 								.rotateZ(5*angle).rotateX(2*angle));
-		donut.setTransMatrix(new Matrix4().multiply(orbit).scale(0.3f).
+		modelMap.get("donut").setTransMatrix(new Matrix4().multiply(orbit).scale(0.3f).
 								translate(9,0,0).rotateZ(3*angle).rotateX(angle));
 	}
 
@@ -52,9 +51,9 @@ public class Project extends AbstractOpenGLBase {
 	protected void render() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		cube.render();
-		pyramid.render();
-		donut.render();
+		for (Model value : modelMap.values()) {
+			value.render();
+		}
 	}
 
 	@Override
