@@ -14,10 +14,9 @@ public class Matrix4 {
 	}
 
 	public Matrix4(Matrix4 copy) {
+		this.mat4= new float[4][4];
 		for (int i=0; i<4; i++) {
-			for (int j=0; j<4; j++){
-				this.mat4[i][j]= copy.mat4[i][j];
-			}
+			System.arraycopy(copy.mat4[i], 0, this.mat4[i], 0, 4);
 		}
 	}
 
@@ -30,7 +29,6 @@ public class Matrix4 {
 	}
 
 	public Matrix4 multiply(Matrix4 other) {
-		//Matrix4 product = new Matrix4();
 		float[][] mat4 = new float[4][4];
 
 		for(int i=0; i<4; i++) {
@@ -114,9 +112,7 @@ public class Matrix4 {
 		float[] values = new float[16];
 
 		for (int i=0; i<4; i++) {
-			for (int j=0; j<4; j++){
-				values[i*4+j]= this.mat4[i][j];
-			}
+			System.arraycopy(this.mat4[i], 0, values, i * 4, 4);
 		}
 
 		return values;

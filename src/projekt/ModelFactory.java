@@ -7,19 +7,19 @@ import java.io.IOException;
 public class ModelFactory {
     private Matrix4 proMatrix;
 
-    public Model getModel(String planType){
+    public Model getModel(String modelType){
         proMatrix = new Matrix4(1.0f, 10f);
 
-        if(planType == null){
+        if(modelType == null){
             return null;
         }
-        if(planType.equalsIgnoreCase("cube")) {
+        if(modelType.equalsIgnoreCase("cube")) {
             return cube();
         }
-        else if(planType.equalsIgnoreCase("pyramid")){
+        else if(modelType.equalsIgnoreCase("pyramid")){
             return pyramid();
         }
-        else if(planType.equalsIgnoreCase("donut")) {
+        else if(modelType.equalsIgnoreCase("donut")) {
             return donut();
         }
         return null;

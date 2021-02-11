@@ -1,23 +1,16 @@
 package projekt;
 
-import static org.lwjgl.opengl.GL30.*;
-
 import lenz.opengl.AbstractOpenGLBase;
-import lenz.opengl.ShaderProgram;
-import lenz.opengl.Texture;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Scanner;
+
+import static org.lwjgl.opengl.GL30.*;
 
 public class Project extends AbstractOpenGLBase {
 
-	ModelFactory factory = new ModelFactory();
-	HashMap<String, Model> modelMap = new HashMap<>();
-	float angle;
+	private final ModelFactory factory = new ModelFactory();
+	private final HashMap<String, Model> modelMap = new HashMap<>();
+	private float angle;
 
 	public static void main(String[] args) {
 		new Project().start("CG Projekt", 700, 700);
@@ -41,9 +34,9 @@ public class Project extends AbstractOpenGLBase {
 
 		modelMap.get("cube").setTransMatrix(new Matrix4().scale(0.5f).translate(0,0,-2.5f)
 								.rotateX(angle/2).rotateY(angle/2).rotateZ(angle/2));
-		modelMap.get("pyramid").setTransMatrix(new Matrix4().multiply(orbit).scale(0.3f).translate(-7,5,0)
+		modelMap.get("pyramid").setTransMatrix(new Matrix4(orbit).scale(0.3f).translate(-7,5,0)
 								.rotateZ(5*angle).rotateX(2*angle));
-		modelMap.get("donut").setTransMatrix(new Matrix4().multiply(orbit).scale(0.3f).
+		modelMap.get("donut").setTransMatrix(new Matrix4(orbit).scale(0.3f).
 								translate(9,0,0).rotateZ(3*angle).rotateX(angle));
 	}
 

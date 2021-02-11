@@ -39,7 +39,7 @@ public class Model {
         initVbo(normals, 2, 3);
     }
 
-    public void initVbo(float[] data, int index, int size) {
+    void initVbo(float[] data, int index, int size) {
         int vbo = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
@@ -51,16 +51,8 @@ public class Model {
         return shader;
     }
 
-    public int getVao(){
-        return vao;
-    }
-
     public void setTransMatrix(Matrix4 transMatrix){
         this.transMatrix=transMatrix;
-    }
-
-    public Matrix4 getTransMatrix(){
-        return transMatrix;
     }
 
     public void render() {
