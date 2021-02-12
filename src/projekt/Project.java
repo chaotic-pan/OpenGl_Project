@@ -8,7 +8,6 @@ import static org.lwjgl.opengl.GL30.*;
 
 public class Project extends AbstractOpenGLBase {
 
-	private final ModelFactory factory = new ModelFactory();
 	private final HashMap<String, Model> modelMap = new HashMap<>();
 	private float angle;
 
@@ -18,6 +17,7 @@ public class Project extends AbstractOpenGLBase {
 
 	@Override
 	protected void init() {
+		ModelFactory factory = new ModelFactory();
 		modelMap.put("pyramid",factory.getModel("pyramid"));
 		modelMap.put("cube", factory.getModel("cube"));
 		modelMap.put("donut", factory.getModel("donut"));
